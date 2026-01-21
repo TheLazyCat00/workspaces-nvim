@@ -35,7 +35,7 @@ end
 
 function UI:init()
 	for name, theme in pairs(THEMES) do
-		vim.api.nvim_set_hl(self.nsId, theme, { fg = self.ctrl.config.colors[name] })
+		vim.api.nvim_set_hl(0, theme, { fg = self.ctrl.config.colors[name] })
 	end
 	self:updateLines()
 	local dims = self:dimensions()
