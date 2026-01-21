@@ -6,5 +6,9 @@ return {
 	colors = {
 		shortcut = "#EA572A",
 		currentFile = "#06ADDB",
+	},
+	offset = {
+		x = 0,
+		y = 0,
 	}
 }

@@ -11,6 +11,7 @@
 ---@field selectLeaderKey string
 ---@field pinLeaderKey string
 ---@field colors Colors
+---@field offset Vec2
 
 ---@class Vec2
 ---@field x number

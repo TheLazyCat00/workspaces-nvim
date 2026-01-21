@@ -72,8 +72,8 @@ end
 ---@return Vec2
 function UI:pos()
 	return {
-		x = vim.o.columns - self.width,
-		y = 0,
+		x = vim.o.columns - self.width + self.ctrl.config.offset.x,
+		y = self.ctrl.config.offset.y,
 	}
 end
 
