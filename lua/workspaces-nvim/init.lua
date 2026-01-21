@@ -34,15 +34,36 @@ function Controller:new(dataPath, config)
 	return obj
 end
 
+local function refreshWrap(ctrlFunc, uiFunc)
+	---@param ctrl Workspaces.Ctrl
+	local callback = function(ctrl)
+		if ctrlFunc ~= nil then
+			ctrlFunc(ctrl)
+		end
+		if uiFunc ~= nil then
+			uiFunc(ctrl.ui)
+		end
+	end
+	return callback
+end
+
 function Controller:setupEvents()
 	local events = {
 		VimLeavePre = Controller.saveWorkspace,
 		DirChangedPre = Controller.saveWorkspace,
-		DirChanged = Controller.openWorkspace,
-		UIEnter = Controller.init,
-		BufEnter = function (ctrl)
-			ctrl.ui.refresh(ctrl.ui)
-		end
+		DirChanged = refreshWrap(Controller.openWorkspace, ui.UI.refresh),
+		UIEnter = refreshWrap(Controller.openWorkspace, ui.UI.init),
+		BufEnter = refreshWrap(nil, ui.UI.applyColors),
+		WinClosed = function (ctrl)
+			vim.schedule(function ()
+				ui.UI.refresh(ctrl.ui)
+				ui.UI.applyColors(ctrl.ui)
+			end)
+		end,
+		WinNew = function (ctrl)
+			ui.UI.refresh(ctrl.ui)
+			ui.UI.applyColors(ctrl.ui)
+		end,
 	}
 	for event, callback in pairs(events) do
 		vim.api.nvim_create_autocmd(event, {
@@ -96,9 +117,6 @@ end
 function Controller:openWorkspace()
 	local cwd = utils.getcwd()
 	self.workspace = self:getWorkspace(cwd)
-	if self.ui then
-		self.ui:refresh()
-	end
 end
 
 ---@param tab Tab

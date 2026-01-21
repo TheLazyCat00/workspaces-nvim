@@ -18,9 +18,55 @@ local M = {}
 local UI = {}
 UI.__index = UI
 
+local function isValidWindow(win)
+	if vim.api.nvim_win_get_config(win).relative ~= "" then
+		return false
+	end
+
+	local buf = vim.api.nvim_win_get_buf(win)
+
+	if not vim.api.nvim_buf_is_loaded(buf) then
+		return false
+	end
+
+	if vim.bo[buf].buftype ~= "" then
+		return false
+	end
+
+	if not vim.bo[buf].buflisted then
+		return false
+	end
+
+	return true
+end
+
+local function getRightmostCol()
+	local maxCol = 0
+	local foundValidWindow = false
+
+	for _, win in ipairs(vim.api.nvim_list_wins()) do
+		if isValidWindow(win) then
+			foundValidWindow = true
+			local pos = vim.api.nvim_win_get_position(win)
+			local width = vim.api.nvim_win_get_width(win)
+			local rightEdge = pos[2] + width
+
+			if rightEdge > maxCol then
+				maxCol = rightEdge
+			end
+		end
+	end
+
+	if not foundValidWindow then
+		maxCol = vim.o.columns
+	end
+
+	return maxCol
+end
+
 function UI:new(ctrl)
 	local obj = {
-		bufId = vim.api.nvim_create_buf(false, true),
+		bufId = nil,
 		winId = nil,
 		nsId = vim.api.nvim_create_namespace("workspaces-nvim"),
 		ctrl = ctrl,
@@ -34,6 +80,7 @@ function UI:new(ctrl)
 end
 
 function UI:init()
+	self.bufId = vim.api.nvim_create_buf(false, true)
 	for name, theme in pairs(THEMES) do
 		vim.api.nvim_set_hl(0, theme, { fg = self.ctrl.config.colors[name] })
 	end
@@ -71,8 +118,10 @@ end
 
 ---@return Vec2
 function UI:pos()
+	local rightEdge = getRightmostCol()
+
 	return {
-		x = vim.o.columns - self.width + self.ctrl.config.offset.x,
+		x = rightEdge - self.width + self.ctrl.config.offset.x,
 		y = self.ctrl.config.offset.y,
 	}
 end
@@ -110,6 +159,7 @@ function UI:updateLines()
 end
 
 function UI:applyColors()
+	if self.winId == nil then return end
 	vim.api.nvim_buf_clear_namespace(self.bufId, -1, 0, -1)
 	for index = 1, #self.ctrl.config.keys do
 		local key = self.ctrl.config.keys:sub(index, index)
@@ -125,14 +175,10 @@ function UI:applyColors()
 end
 
 function UI:refresh()
-	if self.winId == nil then
-		return
-	end
 	self:updateLines()
 	self:updateDims()
 
 	vim.api.nvim_buf_set_lines(self.bufId, 0, -1, false, self.lines)
-	self:applyColors()
 end
 
 M.UI = UI
