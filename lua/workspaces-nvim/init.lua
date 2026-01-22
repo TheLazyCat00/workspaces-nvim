@@ -16,6 +16,7 @@ Controller.__index = Controller
 function Controller:new(dataPath, config)
 	if vim.uv.fs_stat(dataPath) == nil then
 		vim.fn.mkdir(vim.fn.fnamemodify(dataPath, ":h"), "p")
+		utils.write(dataPath, {})
 	end
 
 	---@type Workspaces.Ctrl
