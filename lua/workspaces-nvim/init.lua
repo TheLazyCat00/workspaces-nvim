@@ -85,7 +85,7 @@ function Controller:setupKeymaps()
 		local key = self.config.keys:sub(i, i)
 		local selectKey = self.config.selectLeaderKey .. key
 		vim.keymap.set("n", selectKey, function ()
-			self:editTab(key)
+			self:openTab(key)
 		end, { desc = "Switch to " .. key })
 
 		local pinKey = self.config.pinLeaderKey .. key
@@ -121,7 +121,7 @@ function Controller:openWorkspace()
 end
 
 ---@param tab Tab
-function Controller:editTab(tab)
+function Controller:openTab(tab)
 	local path = self.workspace[tab]
 	if path == nil then
 		utils.alert("Tab " .. tab .. " has no file")
@@ -140,6 +140,8 @@ end
 function Controller:pinToTab(tab)
 	local currentPath = utils.sanitizePath(vim.fn.expand("%:p"))
 	self.workspace[tab] = currentPath
+	self.ui:refresh()
+	self.ui:applyColors()
 end
 
 function M.setup(opts)
