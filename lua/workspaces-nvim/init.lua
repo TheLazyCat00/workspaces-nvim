@@ -62,8 +62,10 @@ function Controller:setupEvents()
 			end)
 		end,
 		WinNew = function (ctrl)
-			ui.UI.refresh(ctrl.ui)
-			ui.UI.applyColors(ctrl.ui)
+			vim.schedule(function ()
+				ui.UI.refresh(ctrl.ui)
+				ui.UI.applyColors(ctrl.ui)
+			end)
 		end,
 	}
 	for event, callback in pairs(events) do
