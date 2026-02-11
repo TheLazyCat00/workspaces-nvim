@@ -126,7 +126,7 @@ function UI:pos()
 	}
 end
 
-function UI:updateDims()
+function UI:updatePos()
 	local dims = self:dimensions()
 	local pos = self:pos()
 
@@ -158,6 +158,10 @@ function UI:updateLines()
 	end
 end
 
+function UI:updateCurrentFileHighlight()
+	self:applyColors()
+end
+
 function UI:applyColors()
 	if self.winId == nil then return end
 	vim.api.nvim_buf_clear_namespace(self.bufId, -1, 0, -1)
@@ -174,11 +178,16 @@ function UI:applyColors()
 	end
 end
 
-function UI:refresh()
+function UI:updatePosAndContent()
 	self:updateLines()
-	self:updateDims()
+	self:updatePos()
 
 	vim.api.nvim_buf_set_lines(self.bufId, 0, -1, false, self.lines)
+end
+
+function UI:refreshAll()
+	self:updatePosAndContent()
+	self:updateCurrentFileHighlight()
 end
 
 M.UI = UI

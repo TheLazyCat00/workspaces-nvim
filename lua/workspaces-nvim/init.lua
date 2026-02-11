@@ -49,25 +49,25 @@ local function refreshWrap(ctrlFunc, uiFunc)
 end
 
 function Controller:setupEvents()
+	local function updatePos(ctrl)
+		vim.schedule(function()
+			ctrl.ui:updatePos()
+		end)
+	end
+
 	local events = {
 		VimLeavePre = Controller.saveWorkspace,
 		DirChangedPre = Controller.saveWorkspace,
-		DirChanged = refreshWrap(Controller.openWorkspace, ui.UI.refresh),
+		DirChanged = refreshWrap(Controller.openWorkspace, ui.UI.refreshAll),
 		UIEnter = refreshWrap(Controller.openWorkspace, ui.UI.init),
-		BufEnter = refreshWrap(nil, ui.UI.applyColors),
-		WinClosed = function (ctrl)
-			vim.schedule(function ()
-				ui.UI.refresh(ctrl.ui)
-				ui.UI.applyColors(ctrl.ui)
-			end)
+		BufEnter = function(ctrl)
+			ctrl.ui:updateCurrentFileHighlight()
 		end,
-		WinNew = function (ctrl)
-			vim.schedule(function ()
-				ui.UI.refresh(ctrl.ui)
-				ui.UI.applyColors(ctrl.ui)
-			end)
-		end,
+		VimResized = updatePos,
+		WinClosed = updatePos,
+		WinNew = updatePos,
 	}
+
 	for event, callback in pairs(events) do
 		vim.api.nvim_create_autocmd(event, {
 			callback = function ()
@@ -85,6 +85,7 @@ end
 function Controller:setupKeymaps()
 	for i = 1, #self.config.keys do
 		local key = self.config.keys:sub(i, i)
+
 		local selectKey = self.config.selectLeaderKey .. key
 		vim.keymap.set("n", selectKey, function ()
 			self:openTab(key)
@@ -95,6 +96,11 @@ function Controller:setupKeymaps()
 			self:pinToTab(key)
 		end, { desc = "Pin file to " .. key })
 	end
+
+	local clearKey = self.config.clearKey
+	vim.keymap.set("n", clearKey, function ()
+		self:clear()
+	end, { desc = "Clear workspace" })
 end
 
 ---@param path Path
@@ -142,8 +148,12 @@ end
 function Controller:pinToTab(tab)
 	local currentPath = utils.sanitizePath(vim.fn.expand("%:p"))
 	self.workspace[tab] = currentPath
-	self.ui:refresh()
-	self.ui:applyColors()
+	self.ui:refreshAll()
+end
+
+function Controller:clear()
+	self.workspace = {}
+	self.ui:refreshAll()
 end
 
 function M.setup(opts)

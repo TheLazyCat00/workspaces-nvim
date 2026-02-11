@@ -1,8 +1,9 @@
 ---@type Config
 return {
-	keys = "0123456789",
+	keys = "1234567890",
 	selectLeaderKey = "<leader>",
 	pinLeaderKey = "<leader>h",
+	clearKey = "<leader>hd",
 	colors = {
 		shortcut = "#EA572A",
 		currentFile = "#06ADDB",

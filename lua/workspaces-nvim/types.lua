@@ -10,6 +10,7 @@
 ---@field keys string
 ---@field selectLeaderKey string
 ---@field pinLeaderKey string
+---@field clearKey string
 ---@field colors Colors
 ---@field offset Vec2
 
