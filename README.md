@@ -1,6 +1,10 @@
-# workspaces.nvim
+# workspaces-nvim
 
-A simple and persistent file pinning plugin for Neovim. `workspaces.nvim` allows you to pin files to specific keys within a project workspace, giving you quick access to your most important files. It includes a floating UI that displays your pinned files.
+
+https://github.com/user-attachments/assets/994a1da5-1b30-4562-857b-52889803f001
+
+
+A simple and persistent file pinning plugin for Neovim. `workspaces-nvim` allows you to pin files to specific keys within a project workspace, giving you quick access to your most important files. It includes a floating UI that displays your pinned files.
 
 ## Features
 
