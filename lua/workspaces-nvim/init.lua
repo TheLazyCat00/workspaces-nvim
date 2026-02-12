@@ -64,6 +64,7 @@ function Controller:setupEvents()
 			ctrl.ui:updateCurrentFileHighlight()
 		end,
 		VimResized = updatePos,
+		WinResized = updatePos,
 		WinClosed = updatePos,
 		WinNew = updatePos,
 	}
