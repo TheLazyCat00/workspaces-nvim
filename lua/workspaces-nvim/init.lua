@@ -55,18 +55,24 @@ function Controller:setupEvents()
 		end)
 	end
 
+	---@param func fun(ui: Workspaces.UI)
+	---@return fun(ctrl: Workspaces.Ctrl)
+	local function execUIFunc(func)
+		return function (ctrl)
+			func(ctrl.ui)
+		end
+	end
+
 	local events = {
 		VimLeavePre = Controller.saveWorkspace,
 		DirChangedPre = Controller.saveWorkspace,
-		DirChanged = refreshWrap(Controller.openWorkspace, ui.UI.refreshAll),
+		DirChanged = refreshWrap(Controller.openWorkspace, ui.UI.refresh),
 		UIEnter = refreshWrap(Controller.openWorkspace, ui.UI.init),
-		BufEnter = function(ctrl)
-			ctrl.ui:updateCurrentFileHighlight()
-		end,
-		VimResized = updatePos,
-		WinResized = updatePos,
-		WinClosed = updatePos,
-		WinNew = updatePos,
+		BufEnter = execUIFunc(ui.UI.updateCurrentFileHighlight),
+		VimResized = execUIFunc(ui.UI.updatePos),
+		WinResized = execUIFunc(ui.UI.updatePos),
+		WinClosed = execUIFunc(ui.UI.updatePos),
+		WinNew = execUIFunc(ui.UI.updatePos),
 	}
 
 	for event, callback in pairs(events) do
@@ -149,12 +155,12 @@ end
 function Controller:pinToTab(tab)
 	local currentPath = utils.sanitizePath(vim.fn.expand("%:p"))
 	self.workspace[tab] = currentPath
-	self.ui:refreshAll()
+	self.ui:refresh()
 end
 
 function Controller:clear()
 	self.workspace = {}
-	self.ui:refreshAll()
+	self.ui:refresh()
 end
 
 function M.setup(opts)
