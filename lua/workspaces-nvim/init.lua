@@ -28,7 +28,7 @@ function Controller:new(dataPath, config)
 		ui = nil
 	} setmetatable(obj, Controller)
 
-	obj.ui = ui.UI:new(obj)
+	obj.ui = ui:new(obj)
 	obj:setupEvents()
 	obj:setupKeymaps()
 
@@ -49,12 +49,6 @@ local function refreshWrap(ctrlFunc, uiFunc)
 end
 
 function Controller:setupEvents()
-	local function updatePos(ctrl)
-		vim.schedule(function()
-			ctrl.ui:updatePos()
-		end)
-	end
-
 	---@param func fun(ui: Workspaces.UI)
 	---@return fun(ctrl: Workspaces.Ctrl)
 	local function execUIFunc(func)
@@ -66,13 +60,13 @@ function Controller:setupEvents()
 	local events = {
 		VimLeavePre = Controller.saveWorkspace,
 		DirChangedPre = Controller.saveWorkspace,
-		DirChanged = refreshWrap(Controller.openWorkspace, ui.UI.refresh),
-		UIEnter = refreshWrap(Controller.openWorkspace, ui.UI.init),
-		BufEnter = execUIFunc(ui.UI.updateCurrentFileHighlight),
-		VimResized = execUIFunc(ui.UI.updatePos),
-		WinResized = execUIFunc(ui.UI.updatePos),
-		WinClosed = execUIFunc(ui.UI.updatePos),
-		WinNew = execUIFunc(ui.UI.updatePos),
+		DirChanged = refreshWrap(Controller.openWorkspace, ui.refresh),
+		UIEnter = refreshWrap(Controller.openWorkspace, ui.init),
+		BufEnter = execUIFunc(ui.updateCurrentFileHighlight),
+		VimResized = execUIFunc(ui.updatePos),
+		WinResized = execUIFunc(ui.updatePos),
+		WinClosed = execUIFunc(ui.updatePos),
+		WinNew = execUIFunc(ui.updatePos),
 	}
 
 	for event, callback in pairs(events) do

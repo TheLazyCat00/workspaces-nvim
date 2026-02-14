@@ -5,8 +5,6 @@ local THEMES = {
 	currentFile = "WorkspacesCurrentFile",
 }
 
-local M = {}
-
 ---@class Workspaces.UI
 ---@field winId number?
 ---@field bufId number?
@@ -229,6 +227,4 @@ function UI:refresh()
 	self:applyColors()
 end
 
-M.UI = UI
-
-return M
+return UI
