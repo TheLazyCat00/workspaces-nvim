@@ -89,12 +89,12 @@ function Controller:setupKeymaps()
 
 		local selectKey = self.config.selectLeaderKey .. key
 		vim.keymap.set("n", selectKey, function ()
-			self:openTab(key)
+			self:accessPin(key)
 		end, { desc = "Switch to " .. key })
 
 		local pinKey = self.config.pinLeaderKey .. key
 		vim.keymap.set("n", pinKey, function ()
-			self:pinToTab(key)
+			self:pin(key)
 		end, { desc = "Pin file to " .. key })
 	end
 
@@ -129,26 +129,26 @@ function Controller:openWorkspace()
 	self.workspace = self:getWorkspace(cwd)
 end
 
----@param tab Tab
-function Controller:openTab(tab)
-	local path = self.workspace[tab]
+---@param pin Pin
+function Controller:accessPin(pin)
+	local path = self.workspace[pin]
 	if path == nil then
-		utils.alert("Tab " .. tab .. " has no file")
+		utils.alert("Pin " .. pin .. " has no file")
 		return
 	end
 
 	if vim.uv.fs_stat(path) == nil then
-		utils.alert("File of tab " .. tab .. " doesn't exist")
+		utils.alert("File of pin " .. pin .. " doesn't exist")
 		return
 	end
 
 	vim.cmd("edit " .. path)
 end
 
----@param tab Tab
-function Controller:pinToTab(tab)
+---@param pin Pin
+function Controller:pin(pin)
 	local currentPath = utils.sanitizePath(vim.fn.expand("%:p"))
-	self.workspace[tab] = currentPath
+	self.workspace[pin] = currentPath
 	self.ui:refresh()
 end
 

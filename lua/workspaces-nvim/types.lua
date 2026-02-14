@@ -1,6 +1,6 @@
 ---@alias Path string
----@alias Tab string
----@alias Workspace table<Tab, Path>
+---@alias Pin string
+---@alias Workspace table<Pin, Path>
 
 ---@class Colors
 ---@field shortcut string
